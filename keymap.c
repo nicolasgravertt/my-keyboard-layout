@@ -1,16 +1,23 @@
 #include QMK_KEYBOARD_H
 
+static void handleBoot(void);
+static uint32_t key_timer_boot = 0;
+uint32_t tiempo_boot = 0;
+bool is_boot_active = false;
+
 typedef struct {
   bool is_press_action;
   int state;
 } tap;
+
 enum layers {
   _BASE,
   _SYM,
   _MOUSE,
 };
 enum custom_keycodes {
-    KC_DOLLARBRACES = SAFE_RANGE // ${}
+    KC_DOLLARBRACES = SAFE_RANGE, // ${}
+    ONOFFBOT
 };
 
 enum {
@@ -29,6 +36,15 @@ int cur_dance (tap_dance_state_t *state);
 void alt_finished (tap_dance_state_t *state, void *user_data);
 void alt_reset (tap_dance_state_t *state, void *user_data);
 
+void handleBoot(){
+  is_boot_active = !is_boot_active;
+  if(is_boot_active){
+    tiempo_boot = 60000; //1 minuto
+  }else{
+    tiempo_boot = 0;
+  }  
+}
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (record->event.pressed) {
         switch (keycode) {
@@ -43,11 +59,35 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                   clear_oneshot_layer_state(ONESHOT_OTHER_KEY_PRESSED);
                   return true;
                 }
+            case ONOFFBOT:
+              if (record->event.pressed){
+                handleBoot();
+              }
+            break;
             default:
                 return true;
         }
     }
     return true;
+}
+
+void matrix_scan_user(void) {
+  if (timer_elapsed32(key_timer_boot) > tiempo_boot) {
+      key_timer_boot = timer_read32();
+      if(is_boot_active){
+       tap_code(KC_2);
+      //Si se va a usar funciones del ratón, hay que poner a YES la opción MOUSEKEY_ENABLE en el rules.mk 
+      // SEND_STRING(SS_TAP(X_WH_U)); //Rueda del ratón hacia arriba
+      // SEND_STRING(SS_TAP(X_WH_D)); //Rueda del ratón hacia abajo
+      // SEND_STRING(SS_TAP(X_MS_U)); //Mueve el ratón hacia arriba
+      // SEND_STRING(SS_TAP(X_MS_D)); //Mueve el ratón hacia abajo
+      // SEND_STRING(SS_TAP(X_MS_R)); //Mueve el ratón hacia derecha
+      // SEND_STRING(SS_TAP(X_MS_L)); //Mueve el ratón hacia izquierda
+      // SEND_STRING(SS_TAP(X_BTN1)); //Pulsa el botón 1 del ratón
+      // SEND_STRING(SS_TAP(X_BTN2)); //Pulsa el botón 2 del ratón
+      // SEND_STRING(SS_TAP(X_BTN3)); //Pulsa el botón 3 del ratón
+      }
+    } 
 }
 
 int cur_dance (tap_dance_state_t *state) {
@@ -129,7 +169,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 ),
 [_MOUSE] = LAYOUT(
   KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,                     KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,
-  KC_NO,   KC_NO, KC_NO,   KC_NO, KC_NO, KC_NO,                     KC_NO,   KC_NO,   KC_UP,   KC_NO, KC_NO, KC_NO,
+  ONOFFBOT,   KC_NO, KC_NO,   KC_NO, KC_NO, KC_NO,                     KC_NO,   KC_NO,   KC_UP,   KC_NO, KC_NO, KC_NO,
   KC_NO,   KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,                     KC_NO,   KC_LEFT, KC_DOWN, KC_RGHT, KC_NO,   KC_NO,
   KC_NO,   KC_DOLLARBRACES,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO, KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,
   KC_NO, TD(ALT_OSL1), KC_NO,   KC_NO, KC_NO,   KC_NO,   KC_NO,   KC_NO

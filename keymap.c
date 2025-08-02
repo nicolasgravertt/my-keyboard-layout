@@ -39,8 +39,11 @@ void alt_reset (tap_dance_state_t *state, void *user_data);
 void handleBoot(){
   is_boot_active = !is_boot_active;
   if(is_boot_active){
+    rgblight_mode_noeeprom(RGB_MATRIX_CYCLE_LEFT_RIGHT);
     tiempo_boot = 60000; //1 minuto
   }else{
+    rgblight_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
+    rgb_matrix_sethsv(170, 255, 255);  // color azul intenso
     tiempo_boot = 0;
   }  
 }
@@ -169,9 +172,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 ),
 [_MOUSE] = LAYOUT(
   KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,                     KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,
-  ONOFFBOT,   KC_NO, KC_NO,   KC_NO, KC_NO, KC_NO,                     KC_NO,   KC_NO,   KC_UP,   KC_NO, KC_NO, KC_NO,
+  KC_NO,   KC_NO, KC_NO,   KC_NO, KC_NO, KC_NO,                     KC_NO,   KC_NO,   KC_UP,   KC_NO, KC_NO, KC_NO,
   KC_NO,   KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,                     KC_NO,   KC_LEFT, KC_DOWN, KC_RGHT, KC_NO,   KC_NO,
   KC_NO,   KC_DOLLARBRACES,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO, KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,
-  KC_NO, TD(ALT_OSL1), KC_NO,   KC_NO, KC_NO,   KC_NO,   KC_NO,   KC_NO
+  KC_NO, TD(ALT_OSL1), KC_NO,   KC_NO, KC_NO,   KC_NO,   KC_NO,   ONOFFBOT
 )
 };

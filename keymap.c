@@ -4,6 +4,7 @@ static void handleBoot(void);
 static uint32_t key_timer_boot = 0;
 uint32_t tiempo_boot = 0;
 bool is_boot_active = false;
+bool override_rgb = false;
 
 typedef struct {
   bool is_press_action;
@@ -39,13 +40,32 @@ void alt_reset (tap_dance_state_t *state, void *user_data);
 void handleBoot(){
   is_boot_active = !is_boot_active;
   if(is_boot_active){
+    override_rgb = true;
     rgblight_mode_noeeprom(RGB_MATRIX_CYCLE_LEFT_RIGHT);
     tiempo_boot = 60000; //1 minuto
   }else{
-    rgblight_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
-    rgb_matrix_sethsv(170, 255, 255);  // color azul intenso
+    override_rgb = false;
     tiempo_boot = 0;
   }  
+}
+
+layer_state_t layer_state_set_user(layer_state_t state) {
+  if (override_rgb) return state;  
+  switch (get_highest_layer(state)) {
+    case _BASE: // Capa base
+        rgb_matrix_mode(RGB_MATRIX_SOLID_COLOR);
+        rgb_matrix_sethsv(170, 255, 255); // Azul
+        break;
+    case _SYM:
+        rgb_matrix_mode(RGB_MATRIX_SOLID_COLOR);
+        rgb_matrix_sethsv(85, 255, 255); // Verde
+        break;
+    case _MOUSE:
+        rgb_matrix_mode(RGB_MATRIX_SOLID_COLOR);
+        rgb_matrix_sethsv(0, 255, 255); // Rojo
+        break;
+  }
+  return state;
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -78,7 +98,7 @@ void matrix_scan_user(void) {
   if (timer_elapsed32(key_timer_boot) > tiempo_boot) {
       key_timer_boot = timer_read32();
       if(is_boot_active){
-       tap_code(KC_2);
+      tap_code(KC_2);
       //Si se va a usar funciones del ratón, hay que poner a YES la opción MOUSEKEY_ENABLE en el rules.mk 
       // SEND_STRING(SS_TAP(X_WH_U)); //Rueda del ratón hacia arriba
       // SEND_STRING(SS_TAP(X_WH_D)); //Rueda del ratón hacia abajo
@@ -117,18 +137,36 @@ static tap alttap_state = {
 void alt_finished (tap_dance_state_t *state, void *user_data) {
   alttap_state.state = cur_dance(state);
   switch (alttap_state.state) {
-    case SINGLE_TAP: set_oneshot_layer(_MOUSE, ONESHOT_START); clear_oneshot_layer_state(ONESHOT_PRESSED); break;
-    case SINGLE_HOLD: register_code(KC_LALT); break;
-    case DOUBLE_TAP: set_oneshot_layer(_MOUSE, ONESHOT_START); set_oneshot_layer(_MOUSE, ONESHOT_PRESSED); break;
-    case DOUBLE_HOLD: register_code(KC_LALT); layer_on(_MOUSE); break;
+    case SINGLE_TAP: 
+      set_oneshot_layer(_MOUSE, ONESHOT_START); 
+      clear_oneshot_layer_state(ONESHOT_PRESSED);
+      break;
+    case SINGLE_HOLD: 
+      register_code(KC_LALT); 
+      break;
+    case DOUBLE_TAP:
+      set_oneshot_layer(_MOUSE, ONESHOT_START); 
+      set_oneshot_layer(_MOUSE, ONESHOT_PRESSED);
+      break;
+    case DOUBLE_HOLD: 
+      register_code(KC_LALT); 
+      layer_on(_MOUSE); 
+      break;
   }
 }
 void alt_reset (tap_dance_state_t *state, void *user_data) {
   switch (alttap_state.state) {
-    case SINGLE_TAP: break;
-    case SINGLE_HOLD: unregister_code(KC_LALT); break;
-    case DOUBLE_TAP: break;
-    case DOUBLE_HOLD: layer_off(_MOUSE); unregister_code(KC_LALT); break;
+    case SINGLE_TAP: 
+      break;
+    case SINGLE_HOLD: 
+      unregister_code(KC_LALT); 
+      break;
+    case DOUBLE_TAP: 
+      break;
+    case DOUBLE_HOLD: 
+      layer_off(_MOUSE); 
+      unregister_code(KC_LALT); 
+      break;
   }
   alttap_state.state = 0;
 }

@@ -17,7 +17,7 @@ enum layers {
   _MOUSE,
 };
 enum custom_keycodes {
-    KC_DOLLARBRACES = SAFE_RANGE, // ${}
+    KC_DOLLARBRACES = SAFE_RANGE,
     ONOFFBOT
 };
 
@@ -52,7 +52,7 @@ void handleBoot(){
 layer_state_t layer_state_set_user(layer_state_t state) {
   if (override_rgb) return state;  
   switch (get_highest_layer(state)) {
-    case _BASE: // Capa base
+    case _BASE:
         rgb_matrix_mode(RGB_MATRIX_SOLID_COLOR);
         rgb_matrix_sethsv(170, 255, 255); // Azul
         break;
@@ -72,23 +72,22 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (record->event.pressed) {
         switch (keycode) {
             case KC_DOLLARBRACES:
-                tap_code16(S(KC_4));  // $
-                tap_code16(S(KC_LBRC));  // {
-                tap_code16(S(KC_RBRC));  // }
-                return false;
-            case KC_NO:
-                /* Always cancel one-shot layer when another key gets pressed */
-                if (record->event.pressed && is_oneshot_layer_active()){
-                  clear_oneshot_layer_state(ONESHOT_OTHER_KEY_PRESSED);
-                  return true;
-                }
+              tap_code16(S(KC_4));  // $
+              tap_code16(S(KC_LBRC));  // {
+              tap_code16(S(KC_RBRC));  // }
+              return false;
             case ONOFFBOT:
               if (record->event.pressed){
                 handleBoot();
               }
-            break;
+              return false;
+            case KC_NO:
+              if (is_oneshot_layer_active()){
+                clear_oneshot_layer_state(ONESHOT_OTHER_KEY_PRESSED);
+              }
+              return true;
             default:
-                return true;
+              return true;
         }
     }
     return true;
@@ -98,17 +97,7 @@ void matrix_scan_user(void) {
   if (timer_elapsed32(key_timer_boot) > tiempo_boot) {
       key_timer_boot = timer_read32();
       if(is_boot_active){
-      tap_code(KC_2);
-      //Si se va a usar funciones del ratón, hay que poner a YES la opción MOUSEKEY_ENABLE en el rules.mk 
-      // SEND_STRING(SS_TAP(X_WH_U)); //Rueda del ratón hacia arriba
-      // SEND_STRING(SS_TAP(X_WH_D)); //Rueda del ratón hacia abajo
-      // SEND_STRING(SS_TAP(X_MS_U)); //Mueve el ratón hacia arriba
-      // SEND_STRING(SS_TAP(X_MS_D)); //Mueve el ratón hacia abajo
-      // SEND_STRING(SS_TAP(X_MS_R)); //Mueve el ratón hacia derecha
-      // SEND_STRING(SS_TAP(X_MS_L)); //Mueve el ratón hacia izquierda
-      // SEND_STRING(SS_TAP(X_BTN1)); //Pulsa el botón 1 del ratón
-      // SEND_STRING(SS_TAP(X_BTN2)); //Pulsa el botón 2 del ratón
-      // SEND_STRING(SS_TAP(X_BTN3)); //Pulsa el botón 3 del ratón
+        tap_code(KC_2);
       }
     } 
 }
@@ -211,8 +200,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_MOUSE] = LAYOUT(
   KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,                     KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,
   KC_NO,   KC_NO, KC_NO,   KC_NO, KC_NO, KC_NO,                     KC_NO,   KC_NO,   KC_UP,   KC_NO, KC_NO, KC_NO,
-  KC_NO,   KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,                     KC_NO,   KC_LEFT, KC_DOWN, KC_RGHT, KC_NO,   KC_NO,
-  KC_NO,   KC_DOLLARBRACES,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO, KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,
+  KC_LSFT,   KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,                     KC_NO,   KC_LEFT, KC_DOWN, KC_RGHT, KC_NO,   KC_NO,
+  KC_LCTL,   KC_DOLLARBRACES,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO, KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,
   KC_NO, TD(ALT_OSL1), KC_NO,   KC_NO, KC_NO,   KC_NO,   KC_NO,   ONOFFBOT
 )
 };

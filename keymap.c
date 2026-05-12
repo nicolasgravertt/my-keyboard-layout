@@ -194,7 +194,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   KC_TILD, KC_EXLM, KC_DQUO, KC_HASH, KC_DLR,  KC_PERC,                   KC_BSLS, KC_PSLS, KC_QUES, KC_SCLN, KC_EQUAL, KC_PMNS,
   KC_PIPE, KC_AT,   KC_CIRC, KC_AMPR, KC_ASTR, KC_QUOT,                   KC_LPRN, KC_RPRN, KC_P7,   KC_P8,   KC_P9,    KC_PPLS,
   KC_LSFT, KC_LCBR, KC_RCBR, KC_LPRN, KC_RPRN, KC_NO,                     KC_LBRC, KC_RBRC, KC_P4,   KC_P5,   KC_P6,    KC_PAST,
-  KC_LSFT,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO, KC_NO,   KC_SCLN, KC_COLN, KC_P1,   KC_P2,   KC_PDOT,  KC_PCMM,
+  KC_LSFT,   KC_GRV,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO, KC_NO,   KC_SCLN, KC_COLN, KC_P1,   KC_P2,   KC_PDOT,  KC_PCMM,
   KC_NO,   KC_NO,   KC_NO,   KC_NO, KC_NO,   KC_LT,   KC_GT,   KC_P0
 ),
 [_MOUSE] = LAYOUT(
